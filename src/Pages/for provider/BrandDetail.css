@@ -1,0 +1,146 @@
+/* Header của trang chi tiết (Giữ nguyên) */
+.brand-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand-detail-header h2 {
+  color: var(--dark);
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.brand-detail-header .header-actions {
+  display: flex;
+  gap: 15px;
+}
+
+/* ===== CSS MỚI CHO CARD NGANG ===== */
+
+/* Container cho danh sách card */
+.service-card-list {
+  display: flex;
+  flex-direction: column; /* Hiển thị các card theo chiều dọc */
+  gap: 20px; /* Khoảng cách giữa các card */
+}
+
+/* Kiểu dáng của Card ngang */
+.service-card-horizontal {
+  display: flex;
+  align-items: center; /* Căn giữa các thành phần theo chiều dọc */
+  background: #ffffff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.service-card-horizontal:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Phần hình ảnh (Bên trái) */
+.service-card-image {
+  flex-shrink: 0; /* Không co lại */
+  width: 120px;
+  height: 120px;
+}
+
+.service-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Đảm bảo ảnh lấp đầy khung */
+}
+
+/* Phần nội dung (Ở giữa) */
+.service-card-content {
+  flex-grow: 1; /* Lấp đầy không gian còn lại */
+  padding: 15px 20px;
+}
+
+.service-card-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin: 0 0 5px 0;
+}
+
+.service-card-content p {
+  font-size: 0.95rem;
+  color: var(--gray);
+  margin: 0 0 10px 0;
+}
+
+.service-card-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--primary); /* Giả sử màu primary là màu tím */
+}
+
+/* Phần hành động (Bên phải) */
+.service-card-actions {
+  flex-shrink: 0; /* Không co lại */
+  padding: 20px;
+  border-left: 1px solid var(--border); /* Phân cách với nội dung */
+}
+
+/* Nút nhỏ */
+.btn.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+/* Dòng thông báo rỗng (Giữ nguyên) */
+.grid-empty {
+  text-align: center;
+  color: var(--gray);
+  font-style: italic;
+  padding: 40px;
+  font-size: 1.1rem;
+  background: #fff;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* Responsive cho Card (khi màn hình nhỏ) */
+@media (max-width: 768px) {
+  .service-card-horizontal {
+    flex-direction: column; /* Chuyển thành card dọc */
+    align-items: stretch; /* Kéo dãn các thành phần */
+  }
+
+  .service-card-image {
+    width: 100%;
+    height: 180px; /* Ảnh rộng ra */
+  }
+
+  .service-card-actions {
+    border-left: none;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end; /* Đẩy nút về bên phải */
+  }
+}
+
+/* CSS cho status (Giữ nguyên từ trước) */
+.status-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  font-size: 1.2rem;
+  color: var(--gray);
+}
+.status-container i {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+}
+.status-container.error {
+  color: var(--danger);
+}

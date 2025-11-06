@@ -1,0 +1,96 @@
+/* Trang Quản lý Lịch hẹn */
+.appointment-management-page {
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+/* Thanh điều hướng Tabs */
+.tab-nav {
+  display: flex;
+  border-bottom: 2px solid var(--border, #eee);
+  margin-bottom: 20px;
+}
+
+.tab-link {
+  padding: 10px 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  color: var(--gray, #666);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px; /* Đẩy border xuống dưới */
+}
+
+.tab-link.active {
+  color: var(--primary, blueviolet);
+  border-bottom-color: var(--primary, blueviolet);
+}
+
+/* Danh sách lịch hẹn */
+.appointment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.empty-list {
+  text-align: center;
+  font-style: italic;
+  color: var(--gray, #666);
+  padding: 30px;
+}
+
+/* Thẻ lịch hẹn */
+.appointment-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid var(--border, #eee);
+  border-radius: var(--radius, 8px);
+  box-shadow: var(--shadow, 0 2px 4px rgba(0,0,0,0.05));
+  padding: 20px;
+  gap: 15px;
+}
+
+.appointment-card h4 {
+  margin: 5px 0;
+  font-size: 1.2rem;
+  color: var(--dark, #333);
+}
+
+.appointment-card p {
+  margin: 0;
+  color: var(--gray, #555);
+}
+.appointment-card p.note {
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.appointment-time {
+  font-weight: 700;
+  color: var(--primary, blueviolet);
+  font-size: 1.1rem;
+}
+
+/* Nút bấm của Lịch Chờ */
+.card-actions-pending {
+  display: flex;
+  flex-direction: column; /* Hoặc 'row' nếu muốn ngang */
+  gap: 10px;
+  flex-shrink: 0; /* Không bị co lại */
+}
+
+/* Trạng thái của Lịch Đã Xác Nhận */
+.card-actions-confirmed .status-label {
+  font-weight: 700;
+  color: var(--success, green);
+  flex-shrink: 0;
+}
+
+/* (Thêm CSS cho .form-container, .form-group... nếu cần) */
