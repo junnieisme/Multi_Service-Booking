@@ -12,39 +12,47 @@ const BrandManagement = () => {
   const [selectedBrands, setSelectedBrands] = useState([]);
 
   // HÀM TẢI DỮ LIỆU THƯƠNG HIỆU
-  const fetchBrands = async () => {
-    try {
-      setIsLoading(true);
-
-      const response = await apiFetch("/api/thuong-hieu/get-data-by-ncc", {
-        method: "GET",
-      });
-      // Sửa lỗi: đảm bảo data là một mảng hoặc object hợp lệ
-      const data = await response.json().catch(() => ({}));
-
-      if (response.ok) {
-        // Cần đảm bảo rằng data.brands là một mảng
-        const brandList = Array.isArray(data.brands) ? data.brands : [];
-        setBrands(brandList);
-        console.log("Dữ liệu thương hiệu nhận được:", data);
-      } else {
-        // Xử lý lỗi nếu API trả về trạng thái lỗi (ví dụ: 404, 500)
-        throw new Error(data.message || `Lỗi HTTP: ${response.status}`);
-      }
-    } catch (err) {
-      console.error("Lỗi khi tải thương hiệu:", err);
-      setError(
-        err.message || "Không thể tải danh sách thương hiệu. Vui lòng thử lại."
-      );
-      setBrands([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchBrands();
-  }, []);
+    const controller = new AbortController();
+    const signal = controller.signal; 
+
+    const fetchBrands = async () => {
+      try {
+        setIsLoading(true); 
+
+        const response = await apiFetch("/api/thuong-hieu/get-data-by-ncc", {
+          method: "GET",
+          signal: signal, 
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+          const brandList = Array.isArray(data.data) ? data.data : [];
+          setBrands(brandList);
+        } else {
+          throw new Error(data.message || `Lỗi HTTP: ${response.status}`);
+        }
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Lỗi khi tải thương hiệu:", err);
+          setError(
+            err.message ||
+              "Không thể tải danh sách thương hiệu. Vui lòng thử lại."
+          );
+          setBrands([]);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchBrands(); 
+
+    return () => {
+      console.log("Cleanup: Hủy request đầu tiên.");
+      controller.abort(); 
+    };
+  }, []); 
 
   const handleEnterDeleteMode = () => {
     setIsDeleteMode(true);
@@ -198,7 +206,6 @@ const BrandManagement = () => {
       </div>
 
       {/* Layout danh sách */}
-
       <div className="brand-list-layout">
         {brands.map((brand) => (
           <div
