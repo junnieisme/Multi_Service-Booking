@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react"; // >>> SỬA: Thêm useCallback
 import { useNavigate } from "react-router-dom";
 import { apiFetch } from "../../utils/api";
 import "./BrandManagement.css";
@@ -11,48 +11,54 @@ const BrandManagement = () => {
   const [isDeleteMode, setIsDeleteMode] = useState(false);
   const [selectedBrands, setSelectedBrands] = useState([]);
 
+  // >>> SỬA: Chuyển fetchBrands ra ngoài và bọc bằng useCallback <<<
+  // Điều này cho phép cả useEffect và handleConfirmDelete đều gọi được nó.
+  const fetchBrands = useCallback(async (signal = null) => {
+    setIsLoading(true);
+    setError(null); // Reset lỗi cũ khi tải lại
+
+    try {
+      const response = await apiFetch("/api/thuong-hieu/get-data-by-ncc", {
+        method: "GET",
+        signal: signal, // Sử dụng signal nếu được cung cấp (từ useEffect)
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (response.ok) {
+        const brandList = Array.isArray(data.data) ? data.data : [];
+        setBrands(brandList);
+      } else {
+        throw new Error(data.message || `Lỗi HTTP: ${response.status}`);
+      }
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.error("Lỗi khi tải thương hiệu:", err);
+        setError(
+          err.message ||
+            "Không thể tải danh sách thương hiệu. Vui lòng thử lại."
+        );
+        setBrands([]);
+      }
+    } finally {
+      // Chỉ tắt loading nếu request không bị hủy
+      if (signal?.aborted !== true) {
+        setIsLoading(false);
+      }
+    }
+  }, []); // Phụ thuộc rỗng vì nó không dùng props hay state nào khác (chỉ dùng hàm setState)
+
   // HÀM TẢI DỮ LIỆU THƯƠNG HIỆU
   useEffect(() => {
     const controller = new AbortController();
-    const signal = controller.signal; 
-
-    const fetchBrands = async () => {
-      try {
-        setIsLoading(true); 
-
-        const response = await apiFetch("/api/thuong-hieu/get-data-by-ncc", {
-          method: "GET",
-          signal: signal, 
-        });
-        const data = await response.json().catch(() => ({}));
-
-        if (response.ok) {
-          const brandList = Array.isArray(data.data) ? data.data : [];
-          setBrands(brandList);
-        } else {
-          throw new Error(data.message || `Lỗi HTTP: ${response.status}`);
-        }
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          console.error("Lỗi khi tải thương hiệu:", err);
-          setError(
-            err.message ||
-              "Không thể tải danh sách thương hiệu. Vui lòng thử lại."
-          );
-          setBrands([]);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchBrands(); 
+    
+    // >>> SỬA: Gọi hàm fetchBrands đã được định nghĩa ở ngoài
+    fetchBrands(controller.signal);
 
     return () => {
       console.log("Cleanup: Hủy request đầu tiên.");
-      controller.abort(); 
+      controller.abort();
     };
-  }, []); 
+  }, [fetchBrands]); // >>> SỬA: Thêm fetchBrands vào dependency array
 
   const handleEnterDeleteMode = () => {
     setIsDeleteMode(true);
@@ -101,6 +107,8 @@ const BrandManagement = () => {
 
         alert("Xóa thành công!");
         handleCancelDelete();
+        
+        // >>> SỬA: Dòng này bây giờ sẽ chạy đúng vì fetchBrands đã ở ngoài scope <<<
         fetchBrands(); // Tải lại danh sách
       } catch (err) {
         console.error("Lỗi khi xóa thương hiệu:", err);
