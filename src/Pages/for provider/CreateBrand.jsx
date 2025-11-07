@@ -40,23 +40,31 @@ const CreateBrand = () => {
       }
     };
 
-
     const fetchServices = async () => {
       setIsLoadingServices(true);
       try {
-        const data = await apiFetch("/api/dich-vu/get-data");
-        setServices(data);
+        // >>> Giả định apiFetch trả về data đã được .json()
+        const response = await apiFetch("/api/dich-vu/get-data"); 
+        
+        // Kiểm tra xem response có phải là mảng không
+        if (response && Array.isArray(response.data)) {
+           setServices(response.data);
+        } else {
+           console.error("API /api/dich-vu/get-data không trả về mảng:", response);
+           setServices([]); // Đặt là mảng rỗng nếu data không đúng
+        }
+
       } catch (error) {
-        console.error("Lỗi từ apiFetch:", error);
+        console.error("Lỗi từ apiFetch (dịch vụ):", error);
+        setServices([]); // Đặt là mảng rỗng khi có lỗi
       } finally {
         setIsLoadingServices(false);
       }
-    }; 
+    };
 
     fetchProvinces();
     fetchServices();
   }, []);
-
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -70,35 +78,50 @@ const CreateBrand = () => {
     const file = e.target.files[0];
     if (file) {
       setImageFile(file);
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
       setImagePreview(URL.createObjectURL(file));
     }
   };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const dataToSubmit = new FormData();
+    
+    if (imageFile) {
+      dataToSubmit.append("hinh_anh", imageFile);
+    }
+    for (const key in formData) {
+      dataToSubmit.append(key, formData[key]);
+    }
 
 
- const handleSubmit = async (e) => {
-   e.preventDefault();
-   const dataToSubmit = new FormData();
-   if (imageFile) {
-     dataToSubmit.append("hinh_anh", imageFile);
-   }
-   for (const key in formData) {
-     dataToSubmit.append(key, formData[key]);
-   }
-   console.log("Dữ liệu chuẩn bị gửi đi:");
-   for (let [key, value] of dataToSubmit.entries()) {
-     console.log(key, value);
-   }
+    try {
+      const response = await apiFetch("/api/thuong-hieu/create", {
+        method: "POST",
+        body: dataToSubmit,
 
-   try {
-     alert("Tạo thương hiệu thành công! (Xem console log)");
-     navigate("/provider/brands");
-   } catch (error) {
-     console.error("Lỗi khi tạo thương hiệu:", error);
-     alert("Tạo thương hiệu thất bại, vui lòng thử lại.");
-   }
- };
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.message || `Lỗi HTTP: ${response.status}`
+        );
+      }
+
+      // Nếu thành công
+      alert("Tạo thương hiệu thành công!");
+      navigate("/provider/brands"); 
+
+    } catch (error) {
+
+      console.error("Lỗi khi tạo thương hiệu:", error);
+      alert(`Tạo thương hiệu thất bại: ${error.message || "Vui lòng thử lại."}`);
+    }
+  };
+
   return (
-
     <div className="create-brand-page">
       <div className="form-container">
         <h2>Tạo thương hiệu mới</h2>
@@ -108,7 +131,6 @@ const CreateBrand = () => {
         </p>
 
         <form onSubmit={handleSubmit}>
-
           <div className="form-section">
             <div className="form-group">
               <label htmlFor="ten_thuong_hieu">Tên thương hiệu (*)</label>
@@ -146,7 +168,6 @@ const CreateBrand = () => {
               </select>
             </div>
           </div>
-
 
           <div className="form-section">
             <div className="form-group">
@@ -240,7 +261,7 @@ const CreateBrand = () => {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate(-1)} 
             >
               Hủy
             </button>
