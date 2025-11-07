@@ -23,7 +23,7 @@ const BrandManagement = () => {
         signal: signal, // Sử dụng signal nếu được cung cấp (từ useEffect)
       });
       const data = await response.json().catch(() => ({}));
-
+      
       if (response.ok) {
         const brandList = Array.isArray(data.data) ? data.data : [];
         setBrands(brandList);
@@ -214,77 +214,70 @@ const BrandManagement = () => {
       </div>
 
       {/* Layout danh sách */}
-      <div className="brand-list-layout">
-        {brands.map((brand) => (
-          <div
-            key={brand.id}
-            className={`brand-card ${
-              selectedBrands.includes(brand.id) ? "selected" : ""
-            }`}
-            // Cho phép chọn khi bấm vào thẻ (ở chế độ xóa)
+     <div className="brand-list-layout">
+  {brands && brands.length > 0 ? (
+    brands.map((brand) => (
+      <div
+        key={brand.id}
+        className={`brand-card ${
+          selectedBrands.includes(brand.id) ? "selected" : ""
+        }`}
+        // Cho phép chọn khi bấm vào thẻ (ở chế độ xóa)
+        onClick={() => isDeleteMode && handleSelectBrand(brand.id)}
+      >
+        {/* Checkbox (Chỉ hiển thị ở chế độ xóa) */}
+        <div className="delete-checkbox">
+          <input
+            type="checkbox"
+            checked={selectedBrands.includes(brand.id)}
+            // Thêm onChange rỗng để React không báo lỗi
+            onChange={() => {}}
+            style={{ cursor: isDeleteMode ? "pointer" : "default" }}
+          />
+        </div>
 
-            onClick={() => isDeleteMode && handleSelectBrand(brand.id)}
-          >
-            {/* Checkbox (Chỉ hiển thị ở chế độ xóa) */}
+        {/* Hình ảnh */}
+        <div
+          className="brand-card-image"
+          style={{
+            backgroundImage: `url(${
+              brand.hinh_anh ||
+              "https://via.placeholder.com/400x250.png?text=No+Image"
+            })`,
+          }}
+        ></div>
 
-            <div className="delete-checkbox">
-              <input
-                type="checkbox"
-                checked={selectedBrands.includes(brand.id)}
-                // Thêm onChange rỗng để React không báo lỗi
-
-                // Logic đã được xử lý ở onClick của .brand-card
-
-                onChange={() => {}}
-                style={{ cursor: isDeleteMode ? "pointer" : "default" }}
-              />
-            </div>
-
-            {/* Hình ảnh */}
-
-            <div
-              className="brand-card-image"
-              style={{
-                backgroundImage: `url(${
-                  brand.hinh_anh ||
-                  "https://via.placeholder.com/400x250.png?text=No+Image"
-                })`,
-              }}
-            ></div>
-
-            {/* Nội dung */}
-
-            <div className="brand-card-content">
-              <h3 className="brand-card-title">{brand.ten_thuong_hieu}</h3>
-
-              <p className="brand-card-description">{brand.mo_ta_ngan}</p>
-
-              <div className="brand-card-location">
-                <i className="fas fa-map-marker-alt"></i>
-
-                <span>
-                  {brand.dia_chi_cu_the}, {brand.tinh_thanh}
-                </span>
-              </div>
-            </div>
-
-            {/* Nút bấm */}
-
-            <div className="brand-card-actions">
-              <button
-                className="btn btn-secondary"
-                onClick={(e) => {
-                  e.stopPropagation();
-
-                  navigate(`/provider/brands/edit/${brand.id}`);
-                }}
-              >
-                Quản lý
-              </button>
-            </div>
+        {/* Nội dung */}
+        <div className="brand-card-content">
+          <h3 className="brand-card-title">{brand.ten_thuong_hieu}</h3>
+          <p className="brand-card-description">{brand.mo_ta_ngan}</p>
+          <div className="brand-card-location">
+            <i className="fas fa-map-marker-alt"></i>
+            <span>
+              {brand.dia_chi_cu_the}, {brand.tinh_thanh}
+            </span>
           </div>
-        ))}
+        </div>
+
+        {/* Nút bấm */}
+        <div className="brand-card-actions">
+          <button
+            className="btn btn-secondary"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/provider/brands/edit/${brand.id}`);
+            }}
+          >
+            Quản lý
+          </button>
+        </div>
       </div>
+    ))
+  ) : (
+    <p>Không có thương hiệu nào để hiển thị.</p>
+  )}
+</div>
+
     </div>
   );
 };
